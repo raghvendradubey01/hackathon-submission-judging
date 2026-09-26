@@ -1,0 +1,6 @@
+{
+  "name": "HackForge | Open-source Hackathon Platform",
+  "description": "Modern, open-source, self-hostable hackathon management and judging platform with role isolation, weighted rubrics, score normalization, and audit logs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

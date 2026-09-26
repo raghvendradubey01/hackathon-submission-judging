@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: dogfood-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-raptor}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-raptorpass}
+      POSTGRES_DB: ${POSTGRES_DB:-dogfood_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-raptor} -d ${POSTGRES_DB:-dogfood_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dogfood-platform
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-raptor}:${POSTGRES_PASSWORD:-raptorpass}@postgres:5432/${POSTGRES_DB:-dogfood_db}?schema=public
+      - JWT_SECRET=${JWT_SECRET:-raptors_jwt_production_secret_key_dogfood_2026}
+      - OFFLINE_MODE=true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  postgres_data:

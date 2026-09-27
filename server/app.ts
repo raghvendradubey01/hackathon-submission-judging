@@ -19,6 +19,21 @@ export function createServer() {
   app.use(express.json({ limit: '10mb' }));
   app.use(rateLimiter);
 
+  // Serve static assets from public folder (including demo video)
+  app.use(express.static(path.resolve(__dirname, '../public')));
+
+  // Direct video file download endpoint
+  app.get('/api/video/download', (req, res) => {
+    const videoFile = path.resolve(__dirname, '../public/hackforge-demo.mp4');
+    res.download(videoFile, 'hackforge-demo.mp4');
+  });
+
+  // Direct presentation PPTX file download endpoint
+  app.get('/api/presentation/download', (req, res) => {
+    const pptFile = path.resolve(__dirname, '../public/hackforge-presentation.pptx');
+    res.download(pptFile, 'hackforge-presentation.pptx');
+  });
+
   // Health check endpoint for Docker & load balancers
   app.get('/api/health', (req, res) => {
     res.json({

@@ -16,7 +16,12 @@ import {
   Lock,
   Layers,
   Sparkles,
-  Play
+  Play,
+  Download,
+  Copy,
+  Check,
+  Film,
+  Presentation
 } from 'lucide-react';
 import { HackathonEvent } from '../types';
 
@@ -33,6 +38,20 @@ export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
   onOpenRoleSwitcher,
   onOpenVideoDemo,
 }) => {
+  const [copiedLink, setCopiedLink] = React.useState(false);
+
+  const videoUrl = '/hackforge-demo.mp4';
+  const fullVideoUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}${videoUrl}`
+    : videoUrl;
+
+  const handleCopy = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(fullVideoUrl);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2500);
+    }
+  };
   const platformFeatures = [
     {
       title: 'Event Management',
@@ -123,12 +142,32 @@ export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
               <button
                 onClick={onOpenVideoDemo}
                 className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs font-mono flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
-                title="Watch automated 30-second walkthrough from login to final submission"
+                title="Watch full 35-second walkthrough"
               >
                 <Play className="w-3.5 h-3.5 fill-slate-950" />
-                <span>Watch 30s Demo Video</span>
+                <span>Watch 35s Demo Video</span>
               </button>
             )}
+
+            <a
+              href="/hackforge-demo.mp4"
+              download="hackforge-demo.mp4"
+              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs font-mono flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
+              title="Download high-resolution 1080p MP4 file directly"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Download Video (MP4)</span>
+            </a>
+
+            <a
+              href="/hackforge-presentation.pptx"
+              download="hackforge-presentation.pptx"
+              className="px-4 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-lg text-xs font-mono flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
+              title="Download 9-Slide Project Presentation (.pptx)"
+            >
+              <Presentation className="w-3.5 h-3.5" />
+              <span>Download Slide Deck (.PPTX)</span>
+            </a>
 
             <button
               onClick={() => onNavigateTab('dashboard')}
@@ -175,6 +214,89 @@ export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
             <div className="text-[10px] text-slate-400 uppercase tracking-wider">Security Model</div>
             <div className="font-bold text-slate-900 text-sm mt-0.5">RBAC & Isolation</div>
             <div className="text-[11px] text-slate-500">Blind queues & embargoes</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Demo Video Showcase & Direct Download Section */}
+      <div className="bg-slate-950 text-white rounded-xl border border-slate-800 p-6 sm:p-8 shadow-xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-800">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-xs font-mono text-emerald-400 uppercase tracking-wider font-semibold">
+                Official Platform Walkthrough
+              </span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white mt-1">
+              HackForge 35-Second End-to-End Demo Video
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
+              Watch registration, hermetic role switching, VCS project linking, automated pre-flight checks, blind judging rubrics, Z-score normalization, and cryptographic certificates.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            <a
+              href="/hackforge-demo.mp4"
+              download="hackforge-demo.mp4"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-mono font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors cursor-pointer shadow-md"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download MP4</span>
+            </a>
+
+            <a
+              href="/hackforge-presentation.pptx"
+              download="hackforge-presentation.pptx"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-mono font-bold bg-sky-600 hover:bg-sky-500 text-white rounded-lg transition-colors cursor-pointer shadow-md"
+            >
+              <Presentation className="w-3.5 h-3.5" />
+              <span>Presentation (.PPTX)</span>
+            </a>
+
+            <a
+              href="/hackforge-demo.webm"
+              download="hackforge-demo.webm"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-mono font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg transition-colors cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>WebM</span>
+            </a>
+
+            <button
+              onClick={handleCopy}
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-mono text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg cursor-pointer"
+              title="Copy direct download link"
+            >
+              {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedLink ? 'Copied URL!' : 'Copy Link'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Video Player Frame */}
+        <div className="mt-5 rounded-lg overflow-hidden border border-slate-800 bg-black aspect-video max-w-4xl mx-auto shadow-2xl">
+          <video
+            controls
+            preload="metadata"
+            className="w-full h-full object-contain"
+            src="/hackforge-demo.mp4"
+          >
+            <source src="/hackforge-demo.mp4" type="video/mp4" />
+            <source src="/hackforge-demo.webm" type="video/webm" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        {/* Direct Link Footnote */}
+        <div className="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-400">
+          <div className="flex items-center gap-2 truncate">
+            <span className="text-slate-500 uppercase text-[11px]">Direct Link:</span>
+            <span className="text-emerald-400 select-all truncate text-[11px]">{fullVideoUrl}</span>
+          </div>
+          <div className="text-[11px] text-slate-500">
+            H.264 High Profile · AAC Stereo Audio · 1920x1080 30fps
           </div>
         </div>
       </div>

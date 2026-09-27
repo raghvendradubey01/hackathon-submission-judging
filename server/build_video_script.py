@@ -1,0 +1,284 @@
+import os
+import subprocess
+
+os.makedirs("/tmp/hackforge_slides", exist_ok=True)
+os.makedirs("public", exist_ok=True)
+
+fb = "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"
+fr = "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"
+
+def slide_script(filename, badge, title, subtitle, draw_ops):
+    return f"""convert -size 1920x1080 xc:"#030712" \\
+  -fill "#0b1120" -stroke "#1e293b" -strokewidth 2 -draw "roundrectangle 60,40,1860,1040,16,16" \\
+  -fill "#0f172a" -stroke "#1e293b" -strokewidth 1 -draw "rectangle 60,40,1860,110" \\
+  -fill "#ef4444" -stroke none -draw "circle 95,75,101,75" \\
+  -fill "#f59e0b" -stroke none -draw "circle 120,75,126,75" \\
+  -fill "#10b981" -stroke none -draw "circle 145,75,151,75" \\
+  -font {fb} -pointsize 18 -fill "#f8fafc" -stroke none -draw "text 180,82 'HACKFORGE // Enterprise Hackathon Platform'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 1550,56,1830,94,6,6" \\
+  -font {fb} -pointsize 13 -fill "#38bdf8" -stroke none -draw "text 1570,79 '{badge}'" \\
+  -fill "#0284c7" -stroke none -draw "roundrectangle 110,145,300,180,6,6" \\
+  -font {fb} -pointsize 13 -fill "#ffffff" -draw "text 125,167 'HACKFORGE PLATFORM'" \\
+  -font {fb} -pointsize 40 -fill "#ffffff" -draw "text 110,240 '{title}'" \\
+  -font {fr} -pointsize 20 -fill "#94a3b8" -draw "text 110,280 '{subtitle}'" \\
+  {draw_ops} \\
+  {filename}
+"""
+
+slides = []
+
+# Slide 1
+s1_ops = f"""-fill "#111827" -stroke "#1f2937" -strokewidth 1 -draw "roundrectangle 110,320,490,460,12,12" \\
+  -font {fr} -pointsize 15 -fill "#6b7280" -stroke none -draw "text 140,360 'REGISTERED HACKERS'" \\
+  -font {fb} -pointsize 46 -fill "#10b981" -draw "text 140,420 '1,240'" \\
+  -fill "#111827" -stroke "#1f2937" -strokewidth 1 -draw "roundrectangle 530,320,910,460,12,12" \\
+  -font {fr} -pointsize 15 -fill "#6b7280" -stroke none -draw "text 560,360 'ACTIVE PROJECT SQUADS'" \\
+  -font {fb} -pointsize 46 -fill "#38bdf8" -draw "text 560,420 '142 Teams'" \\
+  -fill "#111827" -stroke "#1f2937" -strokewidth 1 -draw "roundrectangle 950,320,1330,460,12,12" \\
+  -font {fr} -pointsize 15 -fill "#6b7280" -stroke none -draw "text 980,360 'TOTAL BOUNTY POOL'" \\
+  -font {fb} -pointsize 46 -fill "#f59e0b" -draw "text 980,420 '$50,000'" \\
+  -fill "#111827" -stroke "#1f2937" -strokewidth 1 -draw "roundrectangle 1370,320,1810,460,12,12" \\
+  -font {fr} -pointsize 15 -fill "#6b7280" -stroke none -draw "text 1400,360 'OFFLINE-FIRST ENGINE'" \\
+  -font {fb} -pointsize 46 -fill "#a855f7" -draw "text 1400,420 'Zero Cloud Lock'" \\
+  -fill "#0f172a" -stroke "#1e293b" -strokewidth 1 -draw "roundrectangle 110,490,1810,950,12,12" \\
+  -font {fb} -pointsize 20 -fill "#e2e8f0" -stroke none -draw "text 150,540 'Core Architecture Highlights'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 150,570,920,720,8,8" \\
+  -font {fb} -pointsize 18 -fill "#38bdf8" -stroke none -draw "text 180,610 '1. Hermetic Role-Based Access Control'" \\
+  -font {fr} -pointsize 15 -fill "#94a3b8" -draw "text 180,645 'Strict isolation for Participants, Organizers, Judges, and Super-Admins.'" \\
+  -font {fr} -pointsize 14 -fill "#10b981" -draw "text 180,680 '[PASS] Instant zero-password session switching for testing and audits'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 960,570,1770,720,8,8" \\
+  -font {fb} -pointsize 18 -fill "#38bdf8" -stroke none -draw "text 990,610 '2. Frictionless Team Studio & VCS Submissions'" \\
+  -font {fr} -pointsize 15 -fill "#94a3b8" -draw "text 990,645 'Direct GitHub/GitLab verification, Markdown architecture specs & live URL checking.'" \\
+  -font {fr} -pointsize 14 -fill "#10b981" -draw "text 990,680 '[PASS] Automated pre-flight linting and local draft recovery'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 150,750,920,900,8,8" \\
+  -font {fb} -pointsize 18 -fill "#38bdf8" -stroke none -draw "text 180,790 '3. Blind Rubric & Bradley-Terry Judging'" \\
+  -font {fr} -pointsize 15 -fill "#94a3b8" -draw "text 180,825 'Multi-criteria weighted rubrics paired with pairwise comparison ranking.'" \\
+  -font {fr} -pointsize 14 -fill "#10b981" -draw "text 180,860 '[PASS] Automatic conflict-of-interest exclusion prevents biased assignments'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 960,750,1770,900,8,8" \\
+  -font {fb} -pointsize 18 -fill "#38bdf8" -stroke none -draw "text 990,790 '4. Score Normalization & Tamper-Proof Audit'" \\
+  -font {fr} -pointsize 15 -fill "#94a3b8" -draw "text 990,825 'Z-score normalization balances harsh vs lenient judge biases across tracks.'" \\
+  -font {fr} -pointsize 14 -fill "#10b981" -draw "text 990,860 '[PASS] Immutable SHA-256 submission receipts and exportable audit logs'" \\
+  -fill "#0284c7" -stroke none -draw "rectangle 60,1020,1860,1040"
+"""
+slides.append(slide_script("/tmp/hackforge_slides/slide1.png", "DEMO · 00:05", "Self-Hostable Hackathon Lifecycle Engine", "Full lifecycle: team registration, VCS linking, blind judging, and normalized results.", s1_ops))
+
+# Slide 2
+s2_ops = f"""-fill "#0f172a" -stroke "#1e293b" -strokewidth 1 -draw "roundrectangle 110,320,920,950,12,12" \\
+  -font {fb} -pointsize 20 -fill "#e2e8f0" -stroke none -draw "text 150,370 'Active Participant Profile'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 150,400,880,510,8,8" \\
+  -font {fb} -pointsize 22 -fill "#ffffff" -stroke none -draw "text 180,445 'Elena Rostova'" \\
+  -font {fr} -pointsize 15 -fill "#10b981" -draw "text 180,475 'Participant Role · Distributed Systems Specialist'" \\
+  -font {fr} -pointsize 14 -fill "#64748b" -draw "text 180,498 'elena@distributed-ai.org · Token: eyJhbGciOiJIUzI1Ni...'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 150,540,880,720,8,8" \\
+  -font {fb} -pointsize 17 -fill "#38bdf8" -stroke none -draw "text 180,580 'Session Cryptography & Security'" \\
+  -font {fr} -pointsize 15 -fill "#cbd5e1" -draw "text 180,615 '• JWT Signed with HS256 / 24-hour expiration'" \\
+  -font {fr} -pointsize 15 -fill "#cbd5e1" -draw "text 180,645 '• Offline Seed Store: Local DB fallback without external network'" \\
+  -font {fr} -pointsize 15 -fill "#cbd5e1" -draw "text 180,675 '• Rate Limiting: 120 req/min token bucket against brute force'" \\
+  -font {fr} -pointsize 15 -fill "#10b981" -draw "text 180,705 '• Status: Active Session Verified (HTTP 200)'" \\
+  -fill "#059669" -stroke none -draw "roundrectangle 150,760,880,840,8,8" \\
+  -font {fb} -pointsize 18 -fill "#ffffff" -draw "text 330,810 'ENTER PARTICIPANT WORKSPACE →'" \\
+  -fill "#0f172a" -stroke "#1e293b" -strokewidth 1 -draw "roundrectangle 960,320,1810,950,12,12" \\
+  -font {fb} -pointsize 20 -fill "#e2e8f0" -stroke none -draw "text 1000,370 'Instant Role Switcher (Zero-Relogin)'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 1000,410,1770,520,8,8" \\
+  -font {fb} -pointsize 18 -fill "#f59e0b" -stroke none -draw "text 1030,450 'ORGANIZER: Sarah Jenkins (Lead Director)'" \\
+  -font {fr} -pointsize 14 -fill "#94a3b8" -draw "text 1030,480 'Full access to schedule freeze, rubric weights, track bounties, and audit logs.'" \\
+  -font {fb} -pointsize 13 -fill "#38bdf8" -draw "text 1030,505 'SWITCH TO ORGANIZER [1-CLICK]' " \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 1000,550,1770,660,8,8" \\
+  -font {fb} -pointsize 18 -fill "#a855f7" -stroke none -draw "text 1030,590 'JUDGE: Dr. Marcus Vance (Staff AI Researcher)'" \\
+  -font {fr} -pointsize 14 -fill "#94a3b8" -draw "text 1030,620 'Blind evaluation queue, weighted scoring cards, pairwise comparison matrix.'" \\
+  -font {fb} -pointsize 13 -fill "#38bdf8" -draw "text 1030,645 'SWITCH TO JUDGE [1-CLICK]' " \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 1000,690,1770,800,8,8" \\
+  -font {fb} -pointsize 18 -fill "#ef4444" -stroke none -draw "text 1030,730 'SUPER-ADMIN: System Root (Hermetic Mode)'" \\
+  -font {fr} -pointsize 14 -fill "#94a3b8" -draw "text 1030,760 'Database seeding, raw SQLite inspection, audit log verification, API benchmarks.'" \\
+  -font {fb} -pointsize 13 -fill "#38bdf8" -draw "text 1030,785 'SWITCH TO SUPER-ADMIN [1-CLICK]' " \\
+  -fill "#059669" -stroke none -draw "rectangle 60,1020,1860,1040"
+"""
+slides.append(slide_script("/tmp/hackforge_slides/slide2.png", "STEP 1: AUTH · 00:10", "Multi-Role Hermetic Authentication", "Zero-friction participant login with instant role switcher for hackathon administration.", s2_ops))
+
+# Slide 3
+s3_ops = f"""-fill "#0f172a" -stroke "#1e293b" -strokewidth 1 -draw "roundrectangle 110,320,680,950,12,12" \\
+  -font {fb} -pointsize 20 -fill "#e2e8f0" -stroke none -draw "text 150,370 'Team Studio: NeuralSentry'" \\
+  -font {fr} -pointsize 14 -fill "#64748b" -draw "text 150,395 'Squad Code: FORGE-9021 · 4 Verified Members'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 150,420,640,510,8,8" \\
+  -font {fb} -pointsize 16 -fill "#ffffff" -stroke none -draw "text 180,455 'Elena Rostova (Captain)'" \\
+  -font {fr} -pointsize 13 -fill "#10b981" -draw "text 180,480 'Full-Stack & Distributed Consensus'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 150,530,640,620,8,8" \\
+  -font {fb} -pointsize 16 -fill "#ffffff" -stroke none -draw "text 180,565 'Liam Chen'" \\
+  -font {fr} -pointsize 13 -fill "#38bdf8" -draw "text 180,590 'Edge Inference & Rust Firmware'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 150,640,640,730,8,8" \\
+  -font {fb} -pointsize 16 -fill "#ffffff" -stroke none -draw "text 180,675 'Devendra Patel'" \\
+  -font {fr} -pointsize 13 -fill "#f59e0b" -draw "text 180,700 'Applied Cryptography & Zero-Knowledge'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 150,750,640,840,8,8" \\
+  -font {fb} -pointsize 16 -fill "#ffffff" -stroke none -draw "text 180,785 'Sarah Al-Mansoor'" \\
+  -font {fr} -pointsize 13 -fill "#a855f7" -draw "text 180,810 'Frontend UX & Real-time Visualization'" \\
+  -fill "#0f172a" -stroke "#1e293b" -strokewidth 1 -draw "roundrectangle 720,320,1810,950,12,12" \\
+  -font {fb} -pointsize 20 -fill "#e2e8f0" -stroke none -draw "text 760,370 'Submission Editor & Git VCS Integration'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 760,400,1770,490,8,8" \\
+  -font {fb} -pointsize 13 -fill "#64748b" -stroke none -draw "text 790,430 'PROJECT TITLE'" \\
+  -font {fb} -pointsize 20 -fill "#ffffff" -draw "text 790,465 'NeuralSentry: Real-Time Decentralized Defense Agent'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 760,510,1770,600,8,8" \\
+  -font {fb} -pointsize 13 -fill "#64748b" -stroke none -draw "text 790,540 'CODE REPOSITORY & LIVE DEMO URL'" \\
+  -font {fb} -pointsize 16 -fill "#10b981" -draw "text 790,575 'https://github.com/hackforge/neuralsentry-agent   [HTTP 200 OK]'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 760,620,1770,810,8,8" \\
+  -font {fb} -pointsize 13 -fill "#64748b" -stroke none -draw "text 790,650 'MARKDOWN ARCHITECTURE SPECIFICATION'" \\
+  -font {fr} -pointsize 15 -fill "#cbd5e1" -draw "text 790,685 '## Overview: Autonomous edge agent verifying distributed consensus.'" \\
+  -font {fr} -pointsize 15 -fill "#94a3b8" -draw "text 790,720 '- Architecture: Zero-dependency Rust core compiled to WebAssembly.'" \\
+  -font {fr} -pointsize 15 -fill "#94a3b8" -draw "text 790,755 '- Track: Track 1 - AI & Distributed Systems ($8,000 Grand Prize Track)'" \\
+  -fill "#3b82f6" -stroke none -draw "roundrectangle 760,835,1770,915,8,8" \\
+  -font {fb} -pointsize 18 -fill "#ffffff" -draw "text 1100,880 'RUN AUTOMATED PRE-FLIGHT CHECKS →'" \\
+  -fill "#3b82f6" -stroke none -draw "rectangle 60,1020,1860,1040"
+"""
+slides.append(slide_script("/tmp/hackforge_slides/slide3.png", "STEP 2: TEAM · 00:15", "Team Studio & Frictionless Submission", "Collaborative team formation, bounty track selection, and automated VCS code verification.", s3_ops))
+
+# Slide 4
+s4_ops = f"""-fill "#0f172a" -stroke "#1e293b" -strokewidth 1 -draw "roundrectangle 110,320,920,950,12,12" \\
+  -font {fb} -pointsize 20 -fill "#e2e8f0" -stroke none -draw "text 150,370 'Automated Pre-Flight Gatekeeper'" \\
+  -fill "#064e3b" -stroke "#059669" -strokewidth 1 -draw "roundrectangle 150,410,880,490,8,8" \\
+  -font {fb} -pointsize 16 -fill "#34d399" -stroke none -draw "text 180,445 '✓ [PASS] Git VCS Repository Public & Readable'" \\
+  -font {fr} -pointsize 13 -fill "#a7f3d0" -draw "text 180,470 'Validated commit tree on main branch (24 commits, MIT license detected)'" \\
+  -fill "#064e3b" -stroke "#059669" -strokewidth 1 -draw "roundrectangle 150,510,880,590,8,8" \\
+  -font {fb} -pointsize 16 -fill "#34d399" -stroke none -draw "text 180,545 '✓ [PASS] Team Eligibility & Conflict Screening'" \\
+  -font {fr} -pointsize 13 -fill "#a7f3d0" -draw "text 180,570 'All 4 hackers signed Code of Conduct; zero organizer affiliation'" \\
+  -fill "#064e3b" -stroke "#059669" -strokewidth 1 -draw "roundrectangle 150,610,880,690,8,8" \\
+  -font {fb} -pointsize 16 -fill "#34d399" -stroke none -draw "text 180,645 '✓ [PASS] Bounty Track Rubric Alignment'" \\
+  -font {fr} -pointsize 13 -fill "#a7f3d0" -draw "text 180,670 'Architecture satisfies distributed consensus and edge performance goals'" \\
+  -fill "#064e3b" -stroke "#059669" -strokewidth 1 -draw "roundrectangle 150,710,880,790,8,8" \\
+  -font {fb} -pointsize 16 -fill "#34d399" -stroke none -draw "text 180,745 '✓ [PASS] Timing: 14 Minutes Before Hard Freeze'" \\
+  -font {fr} -pointsize 13 -fill "#a7f3d0" -draw "text 180,770 'Submission timestamp guaranteed on-time before UTC deadline lock'" \\
+  -fill "#0f172a" -stroke "#059669" -strokewidth 2 -draw "roundrectangle 960,320,1810,950,12,12" \\
+  -font {fb} -pointsize 22 -fill "#34d399" -stroke none -draw "text 1000,375 'PROJECT OFFICIALLY SUBMITTED & SEALED'" \\
+  -font {fr} -pointsize 15 -fill "#94a3b8" -draw "text 1000,405 'Dispatched to blind judging queue. Project modifications permanently locked.'" \\
+  -fill "#022c22" -stroke "#059669" -strokewidth 1 -draw "roundrectangle 1000,440,1770,720,8,8" \\
+  -font {fb} -pointsize 14 -fill "#34d399" -stroke none -draw "text 1030,480 'IMMUTABLE CRYPTOGRAPHIC RECEIPT'" \\
+  -font {fb} -pointsize 18 -fill "#ffffff" -draw "text 1030,520 'Submission ID: SUB-9821-NEURALSENTRY'" \\
+  -font {fr} -pointsize 15 -fill "#cbd5e1" -draw "text 1030,560 'SHA-256 Digest:'" \\
+  -font {fb} -pointsize 15 -fill "#38bdf8" -draw "text 1030,590 '7f8a91b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f6'" \\
+  -font {fr} -pointsize 14 -fill "#a7f3d0" -draw "text 1030,630 'Sealed Timestamp: 2026-09-28T17:46:12.894Z (UTC Certified)'" \\
+  -font {fr} -pointsize 14 -fill "#a7f3d0" -draw "text 1030,660 'Verification: Signed by HackForge Local Authority Root'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 1000,750,1770,910,8,8" \\
+  -font {fb} -pointsize 16 -fill "#f59e0b" -stroke none -draw "text 1030,795 'Ready for Blind Evaluation Queue'" \\
+  -font {fr} -pointsize 14 -fill "#94a3b8" -draw "text 1030,830 'Project anonymized and assigned across 3 peer judges with zero team-identity leakage.'" \\
+  -font {fr} -pointsize 14 -fill "#10b981" -draw "text 1030,865 'Audit Log Event #10842 Recorded permanently to disk.'" \\
+  -fill "#8b5cf6" -stroke none -draw "rectangle 60,1020,1860,1040"
+"""
+slides.append(slide_script("/tmp/hackforge_slides/slide4.png", "STEP 3: SEAL · 00:20", "Pre-Flight Integrity & SHA-256 Freeze", "Tamper-evident verification before UTC freeze with immutable submission receipt.", s4_ops))
+
+# Slide 5
+s5_ops = f"""-fill "#0f172a" -stroke "#1e293b" -strokewidth 1 -draw "roundrectangle 110,320,920,950,12,12" \\
+  -font {fb} -pointsize 20 -fill "#e2e8f0" -stroke none -draw "text 150,370 'Weighted Rubric Card (Judge: Dr. Vance)'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 150,400,880,500,8,8" \\
+  -font {fb} -pointsize 16 -fill "#ffffff" -stroke none -draw "text 180,435 '1. Technical Execution (30% Weight)'" \\
+  -fill "#0284c7" -stroke none -draw "roundrectangle 180,455,800,475,4,4" \\
+  -font {fb} -pointsize 15 -fill "#38bdf8" -draw "text 820,470 '9.6 / 10'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 150,520,880,620,8,8" \\
+  -font {fb} -pointsize 16 -fill "#ffffff" -stroke none -draw "text 180,555 '2. Novelty & Innovation (25% Weight)'" \\
+  -fill "#0284c7" -stroke none -draw "roundrectangle 180,575,780,595,4,4" \\
+  -font {fb} -pointsize 15 -fill "#38bdf8" -draw "text 820,590 '9.4 / 10'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 150,640,880,740,8,8" \\
+  -font {fb} -pointsize 16 -fill "#ffffff" -stroke none -draw "text 180,675 '3. Usability & Polish (25% Weight)'" \\
+  -fill "#0284c7" -stroke none -draw "roundrectangle 180,695,760,715,4,4" \\
+  -font {fb} -pointsize 15 -fill "#38bdf8" -draw "text 820,710 '9.2 / 10'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 150,760,880,860,8,8" \\
+  -font {fb} -pointsize 16 -fill "#ffffff" -stroke none -draw "text 180,795 '4. Practical Real-World Impact (20% Weight)'" \\
+  -fill "#0284c7" -stroke none -draw "roundrectangle 180,815,790,835,4,4" \\
+  -font {fb} -pointsize 15 -fill "#38bdf8" -draw "text 820,830 '9.5 / 10'" \\
+  -font {fb} -pointsize 18 -fill "#10b981" -draw "text 180,910 'Composite Weighted Score: 94.4 / 100'" \\
+  -fill "#0f172a" -stroke "#1e293b" -strokewidth 1 -draw "roundrectangle 960,320,1810,950,12,12" \\
+  -font {fb} -pointsize 20 -fill "#e2e8f0" -stroke none -draw "text 1000,370 'Pairwise Bradley-Terry Comparison Matrix'" \\
+  -font {fr} -pointsize 14 -fill "#94a3b8" -draw "text 1000,395 'Eliminates scale calibration errors by directly comparing candidate pairs.'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 1000,420,1770,550,8,8" \\
+  -font {fb} -pointsize 17 -fill "#ffffff" -stroke none -draw "text 1030,460 'Matchup #42: NeuralSentry vs QuantumMesh'" \\
+  -font {fr} -pointsize 14 -fill "#38bdf8" -draw "text 1030,490 'Selected Winner: NeuralSentry (Confidence: 89.2%)'" \\
+  -font {fr} -pointsize 13 -fill "#10b981" -draw "text 1030,520 'Log-odds latent capability update: +1.42 theta'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 1000,570,1770,700,8,8" \\
+  -font {fb} -pointsize 17 -fill "#ffffff" -stroke none -draw "text 1030,610 'Matchup #43: NeuralSentry vs BioSynapse'" \\
+  -font {fr} -pointsize 14 -fill "#38bdf8" -draw "text 1030,640 'Selected Winner: NeuralSentry (Confidence: 94.1%)'" \\
+  -font {fr} -pointsize 13 -fill "#10b981" -draw "text 1030,670 'Log-odds latent capability update: +1.88 theta'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 1000,720,1770,900,8,8" \\
+  -font {fb} -pointsize 17 -fill "#f59e0b" -stroke none -draw "text 1030,760 'Anti-Collusion & COI Shield'" \\
+  -font {fr} -pointsize 14 -fill "#cbd5e1" -draw "text 1030,800 '• Automatic exclusion of judges sharing university or company domain'" \\
+  -font {fr} -pointsize 14 -fill "#cbd5e1" -draw "text 1030,830 '• Double-blind evaluation: Judges cannot see team names or other scores'" \\
+  -font {fr} -pointsize 14 -fill "#10b981" -draw "text 1030,860 '• Maximum Pair Divergence: 0.12 (High Inter-Rater Reliability)'" \\
+  -fill "#d97706" -stroke none -draw "rectangle 60,1020,1860,1040"
+"""
+slides.append(slide_script("/tmp/hackforge_slides/slide5.png", "STEP 4: JUDGING · 00:25", "Blind Rubrics & Bradley-Terry Scoring", "Dual evaluation framework: weighted criteria scoring + head-to-head pairwise preference matrix.", s5_ops))
+
+# Slide 6
+s6_ops = f"""-fill "#0f172a" -stroke "#1e293b" -strokewidth 1 -draw "roundrectangle 110,320,1810,950,12,12" \\
+  -font {fb} -pointsize 20 -fill "#e2e8f0" -stroke none -draw "text 150,370 'Official Verified Hackathon Leaderboard (Post-Audit)'" \\
+  -fill "#111827" -stroke "#1f2937" -strokewidth 1 -draw "rectangle 150,400,1770,450" \\
+  -font {fb} -pointsize 14 -fill "#9ca3af" -stroke none -draw "text 170,432 'RANK'" \\
+  -font {fb} -pointsize 14 -fill "#9ca3af" -draw "text 270,432 'PROJECT NAME'" \\
+  -font {fb} -pointsize 14 -fill "#9ca3af" -draw "text 750,432 'BOUNTY TRACK'" \\
+  -font {fb} -pointsize 14 -fill "#9ca3af" -draw "text 1050,432 'RAW MEAN'" \\
+  -font {fb} -pointsize 14 -fill "#9ca3af" -draw "text 1250,432 'NORMALIZED (Z-SCORE)'" \\
+  -font {fb} -pointsize 14 -fill "#9ca3af" -draw "text 1550,432 'STATUS'" \\
+  -fill "#064e3b" -stroke "#059669" -strokewidth 1 -draw "roundrectangle 150,465,1770,545,8,8" \\
+  -font {fb} -pointsize 22 -fill "#34d399" -stroke none -draw "text 170,515 '🥇 1st'" \\
+  -font {fb} -pointsize 18 -fill "#ffffff" -draw "text 270,513 'NeuralSentry (Edge AI Agent)'" \\
+  -font {fr} -pointsize 15 -fill "#cbd5e1" -draw "text 750,513 'AI & Distributed Systems'" \\
+  -font {fr} -pointsize 16 -fill "#94a3b8" -draw "text 1050,513 '94.2 / 100'" \\
+  -font {fb} -pointsize 22 -fill "#34d399" -draw "text 1250,515 '94.82'" \\
+  -fill "#059669" -stroke none -draw "roundrectangle 1550,485,1730,525,4,4" \\
+  -font {fb} -pointsize 12 -fill "#ffffff" -draw "text 1575,510 'WINNER SEALED'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 150,560,1770,640,8,8" \\
+  -font {fb} -pointsize 22 -fill "#94a3b8" -stroke none -draw "text 170,610 '🥈 2nd'" \\
+  -font {fb} -pointsize 18 -fill "#ffffff" -draw "text 270,608 'QuantumMesh (Secure Protocol)'" \\
+  -font {fr} -pointsize 15 -fill "#cbd5e1" -draw "text 750,608 'Security & Zero-Knowledge'" \\
+  -font {fr} -pointsize 16 -fill "#94a3b8" -draw "text 1050,608 '91.8 / 100'" \\
+  -font {fb} -pointsize 22 -fill "#38bdf8" -draw "text 1250,610 '92.40'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 150,655,1770,735,8,8" \\
+  -font {fb} -pointsize 22 -fill "#d97706" -stroke none -draw "text 170,705 '🥉 3rd'" \\
+  -font {fb} -pointsize 18 -fill "#ffffff" -draw "text 270,703 'BioSynapse (Neural Bridge)'" \\
+  -font {fr} -pointsize 15 -fill "#cbd5e1" -draw "text 750,703 'BioTech & Health Systems'" \\
+  -font {fr} -pointsize 16 -fill "#94a3b8" -draw "text 1050,703 '90.1 / 100'" \\
+  -font {fb} -pointsize 22 -fill "#f59e0b" -draw "text 1250,705 '89.65'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 150,750,1770,830,8,8" \\
+  -font {fb} -pointsize 18 -fill "#64748b" -stroke none -draw "text 180,800 '4th'" \\
+  -font {fb} -pointsize 18 -fill "#cbd5e1" -draw "text 270,798 'OrbitProtocol (Decentralized Mesh)'" \\
+  -font {fr} -pointsize 15 -fill "#cbd5e1" -draw "text 750,798 'Infrastructure & Storage'" \\
+  -font {fr} -pointsize 16 -fill "#94a3b8" -draw "text 1050,798 '88.0 / 100'" \\
+  -font {fb} -pointsize 22 -fill "#94a3b8" -draw "text 1250,800 '88.20'" \\
+  -font {fb} -pointsize 15 -fill "#10b981" -draw "text 150,880 '✓ Normalization Audit Log verified: 100% of score deltas explainable by Bayesian judge variance.'" \\
+  -fill "#10b981" -stroke none -draw "rectangle 60,1020,1860,1040"
+"""
+slides.append(slide_script("/tmp/hackforge_slides/slide6.png", "STEP 5: RESULTS · 00:30", "Z-Score Normalization & Live Results", "Statistical bias compensation algorithm removes harsh vs lenient judge variance.", s6_ops))
+
+# Slide 7
+s7_ops = f"""-fill "#0f172a" -stroke "#1e293b" -strokewidth 1 -draw "roundrectangle 110,320,920,950,12,12" \\
+  -font {fb} -pointsize 20 -fill "#e2e8f0" -stroke none -draw "text 150,370 'Automated SVG/PDF Certificate Generator'" \\
+  -fill "#042f2e" -stroke "#0d9488" -strokewidth 2 -draw "roundrectangle 150,410,880,750,12,12" \\
+  -font {fb} -pointsize 14 -fill "#2dd4bf" -stroke none -draw "text 180,450 'HACKFORGE OFFICIAL CERTIFICATE OF MERIT'" \\
+  -font {fb} -pointsize 24 -fill "#ffffff" -draw "text 180,500 'First Place Overall — Grand Champions'" \\
+  -font {fr} -pointsize 16 -fill "#99f6e4" -draw "text 180,540 'Presented to Team NeuralSentry'" \\
+  -font {fr} -pointsize 14 -fill "#5eead4" -draw "text 180,570 'Elena Rostova · Liam Chen · Devendra Patel · Sarah Al-Mansoor'" \\
+  -font {fr} -pointsize 14 -fill "#94a3b8" -draw "text 180,620 'Score: 94.82/100 · Z-Score Normalized · Verified by Jury'" \\
+  -font {fb} -pointsize 13 -fill "#2dd4bf" -draw "text 180,670 'CERTIFICATE ID: HF-CERT-2026-9021-NS'" \\
+  -font {fb} -pointsize 13 -fill "#2dd4bf" -draw "text 180,700 'SIGNATURE: 0x9a8f...4e1b (Ed25519 Verified)'" \\
+  -fill "#0d9488" -stroke none -draw "roundrectangle 150,780,880,850,8,8" \\
+  -font {fb} -pointsize 16 -fill "#ffffff" -draw "text 380,825 'DOWNLOAD VERIFIABLE CERTIFICATE'" \\
+  -fill "#0f172a" -stroke "#1e293b" -strokewidth 1 -draw "roundrectangle 960,320,1810,950,12,12" \\
+  -font {fb} -pointsize 20 -fill "#e2e8f0" -stroke none -draw "text 1000,370 '1-Command Production Deployment'" \\
+  -fill "#020617" -stroke "#1e293b" -strokewidth 1 -draw "roundrectangle 1000,410,1770,620,8,8" \\
+  -font {fb} -pointsize 14 -fill "#64748b" -stroke none -draw "text 1030,445 'TERMINAL / BASH'" \\
+  -font {fb} -pointsize 17 -fill "#34d399" -draw "text 1030,485 '$ git clone https://github.com/hackforge/platform'" \\
+  -font {fb} -pointsize 17 -fill "#34d399" -draw "text 1030,525 '$ cd platform && docker-compose up -d'" \\
+  -font {fr} -pointsize 15 -fill "#94a3b8" -draw "text 1030,565 '✓ Starting SQLite storage engine... Done'" \\
+  -font {fr} -pointsize 15 -fill "#94a3b8" -draw "text 1030,595 '✓ Server listening hermetically at http://localhost:3000'" \\
+  -fill "#1e293b" -stroke "#334155" -strokewidth 1 -draw "roundrectangle 1000,650,1770,900,8,8" \\
+  -font {fb} -pointsize 18 -fill "#38bdf8" -stroke none -draw "text 1030,695 'Complete Stack Specification'" \\
+  -font {fr} -pointsize 15 -fill "#cbd5e1" -draw "text 1030,735 '• Runtime: Node 22 / Express / Vite 6 / React 19 / TypeScript'" \\
+  -font {fr} -pointsize 15 -fill "#cbd5e1" -draw "text 1030,770 '• Styling: Modern Tailwind CSS (Dark Modern Clean Interface)'" \\
+  -font {fr} -pointsize 15 -fill "#cbd5e1" -draw "text 1030,805 '• Test Coverage: 100% Hermetic Automated Acceptance Suite'" \\
+  -font {fr} -pointsize 15 -fill "#10b981" -draw "text 1030,845 '• License: MIT Open-Source · Fully Customizable for Any Hackathon'" \\
+  -fill "#06b6d4" -stroke none -draw "rectangle 60,1020,1860,1040"
+"""
+slides.append(slide_script("/tmp/hackforge_slides/slide7.png", "STEP 6: DEPLOY · 00:35", "Cryptographic Certificates & Self-Hosting", "Tamper-proof verifiable credentials, embeddable widgets, and simple 1-line deployment.", s7_ops))
+
+# Write all to a shell script and execute
+with open("/tmp/build_video.sh", "w") as f:
+    f.write("#!/bin/bash\nset -e\n")
+    for s in slides:
+        f.write(s + "\n")
+
+print("Created build_video.sh")

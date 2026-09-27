@@ -18,7 +18,8 @@ import {
   FileCode2,
   Activity,
   Sparkles,
-  Play
+  Play,
+  Presentation
 } from 'lucide-react';
 
 interface TopNavProps {
@@ -186,6 +187,16 @@ export const TopNav: React.FC<TopNavProps> = ({
                 <Play className="w-3.5 h-3.5 fill-amber-600 text-amber-600" />
                 <span>30s Demo</span>
               </button>
+
+              <a
+                href="/hackforge-presentation.pptx"
+                download="hackforge-presentation.pptx"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-sky-800 bg-sky-50 hover:bg-sky-100 border border-sky-300 rounded-md transition-colors cursor-pointer shadow-xs"
+                title="Download 9-Slide Presentation Deck (.pptx)"
+              >
+                <Presentation className="w-3.5 h-3.5 text-sky-600" />
+                <span>Slide PPT</span>
+              </a>
 
               <button
                 onClick={onOpenCertificates}

@@ -17,7 +17,8 @@ import {
   Calendar,
   FileCode2,
   Activity,
-  Sparkles
+  Sparkles,
+  Play
 } from 'lucide-react';
 
 interface TopNavProps {
@@ -27,6 +28,7 @@ interface TopNavProps {
   onOpenRoleSwitcher: () => void;
   onOpenCertificates: () => void;
   onOpenApiDocs: () => void;
+  onOpenVideoDemo: () => void;
   onResetData: () => void;
 }
 
@@ -37,6 +39,7 @@ export const TopNav: React.FC<TopNavProps> = ({
   onOpenRoleSwitcher,
   onOpenCertificates,
   onOpenApiDocs,
+  onOpenVideoDemo,
   onResetData,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -176,6 +179,15 @@ export const TopNav: React.FC<TopNavProps> = ({
             {/* Quick Actions (Desktop & Tablet) */}
             <div className="hidden sm:flex items-center gap-1.5">
               <button
+                onClick={onOpenVideoDemo}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded-md transition-colors cursor-pointer shadow-xs"
+                title="Watch 30-Second Demo: Login to Submission"
+              >
+                <Play className="w-3.5 h-3.5 fill-amber-600 text-amber-600" />
+                <span>30s Demo</span>
+              </button>
+
+              <button
                 onClick={onOpenCertificates}
                 className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-md transition-colors cursor-pointer"
                 title="Cryptographic SVG Certificates"
@@ -277,20 +289,27 @@ export const TopNav: React.FC<TopNavProps> = ({
               );
             })}
 
-            <div className="pt-2 mt-2 border-t border-slate-100 grid grid-cols-2 gap-2 px-1">
+            <div className="pt-2 mt-2 border-t border-slate-100 grid grid-cols-3 gap-1.5 px-1">
+              <button
+                onClick={() => { onOpenVideoDemo(); setMobileMenuOpen(false); }}
+                className="flex items-center justify-center gap-1 p-2 text-xs font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded-md cursor-pointer"
+              >
+                <Play className="w-3.5 h-3.5 fill-amber-600 text-amber-600" />
+                Demo
+              </button>
               <button
                 onClick={() => { onOpenCertificates(); setMobileMenuOpen(false); }}
-                className="flex items-center justify-center gap-1.5 p-2 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md cursor-pointer"
+                className="flex items-center justify-center gap-1 p-2 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md cursor-pointer"
               >
                 <Award className="w-3.5 h-3.5 text-slate-600" />
-                Certificates
+                Certs
               </button>
               <button
                 onClick={() => { onOpenApiDocs(); setMobileMenuOpen(false); }}
-                className="flex items-center justify-center gap-1.5 p-2 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md font-mono cursor-pointer"
+                className="flex items-center justify-center gap-1 p-2 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md font-mono cursor-pointer"
               >
                 <Terminal className="w-3.5 h-3.5 text-slate-600" />
-                REST API
+                API
               </button>
             </div>
           </div>

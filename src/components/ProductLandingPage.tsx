@@ -15,7 +15,8 @@ import {
   CheckCircle2,
   Lock,
   Layers,
-  Sparkles
+  Sparkles,
+  Play
 } from 'lucide-react';
 import { HackathonEvent } from '../types';
 
@@ -23,12 +24,14 @@ interface ProductLandingPageProps {
   event: HackathonEvent;
   onNavigateTab: (tab: string) => void;
   onOpenRoleSwitcher: () => void;
+  onOpenVideoDemo?: () => void;
 }
 
 export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
   event,
   onNavigateTab,
   onOpenRoleSwitcher,
+  onOpenVideoDemo,
 }) => {
   const platformFeatures = [
     {
@@ -116,6 +119,17 @@ export const ProductLandingPage: React.FC<ProductLandingPageProps> = ({
           </p>
 
           <div className="flex flex-wrap items-center gap-3 pt-3">
+            {onOpenVideoDemo && (
+              <button
+                onClick={onOpenVideoDemo}
+                className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs font-mono flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
+                title="Watch automated 30-second walkthrough from login to final submission"
+              >
+                <Play className="w-3.5 h-3.5 fill-slate-950" />
+                <span>Watch 30s Demo Video</span>
+              </button>
+            )}
+
             <button
               onClick={() => onNavigateTab('dashboard')}
               className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold font-mono flex items-center gap-2 cursor-pointer shadow-xs transition-colors"

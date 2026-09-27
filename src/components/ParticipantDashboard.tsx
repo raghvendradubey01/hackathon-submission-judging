@@ -11,7 +11,8 @@ import {
   Calendar,
   Layers,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Play
 } from 'lucide-react';
 
 interface ParticipantDashboardProps {
@@ -20,6 +21,7 @@ interface ParticipantDashboardProps {
   teams: Team[];
   submissions: Submission[];
   onNavigateTab: (tab: string) => void;
+  onOpenVideoDemo?: () => void;
 }
 
 export const ParticipantDashboard: React.FC<ParticipantDashboardProps> = ({
@@ -28,6 +30,7 @@ export const ParticipantDashboard: React.FC<ParticipantDashboardProps> = ({
   teams,
   submissions,
   onNavigateTab,
+  onOpenVideoDemo,
 }) => {
   const myTeam = teams.find((t) => t.members.some((m) => m.userId === currentUser.id));
   const mySubmission = myTeam ? submissions.find((s) => s.teamId === myTeam.id) : null;
@@ -60,6 +63,17 @@ export const ParticipantDashboard: React.FC<ParticipantDashboardProps> = ({
           </div>
 
           <div className="flex items-center gap-2.5">
+            {onOpenVideoDemo && (
+              <button
+                onClick={onOpenVideoDemo}
+                className="inline-flex items-center gap-1.5 px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 rounded-md text-xs font-semibold font-mono transition-colors cursor-pointer shadow-xs"
+                title="Watch 30-second walkthrough from login to final submission"
+              >
+                <Play className="w-3.5 h-3.5 fill-amber-600 text-amber-600" />
+                <span>30s Demo Video</span>
+              </button>
+            )}
+
             <button
               onClick={() => onNavigateTab('submissions')}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-semibold font-mono transition-colors cursor-pointer shadow-xs"

@@ -16,6 +16,7 @@ import { RoleSwitcherModal } from './components/RoleSwitcherModal';
 import { CertificateGeneratorModal } from './components/CertificateGeneratorModal';
 import { InteractiveApiPlayground } from './components/InteractiveApiPlayground';
 import { EmbedWidgetModal } from './components/EmbedWidgetModal';
+import { VideoWalkthroughModal } from './components/VideoWalkthroughModal';
 
 export default function App() {
   const [state, setState] = useState<AppState>(store.getState());
@@ -26,6 +27,7 @@ export default function App() {
   const [isCertificatesOpen, setIsCertificatesOpen] = useState(false);
   const [isApiPlaygroundOpen, setIsApiPlaygroundOpen] = useState(false);
   const [isEmbedWidgetOpen, setIsEmbedWidgetOpen] = useState(false);
+  const [isVideoDemoOpen, setIsVideoDemoOpen] = useState(false);
 
   useEffect(() => {
     const unsubscribe = store.subscribe(() => {
@@ -59,6 +61,7 @@ export default function App() {
         onOpenRoleSwitcher={() => setIsRoleSwitcherOpen(true)}
         onOpenCertificates={() => setIsCertificatesOpen(true)}
         onOpenApiDocs={() => setIsApiPlaygroundOpen(true)}
+        onOpenVideoDemo={() => setIsVideoDemoOpen(true)}
         onResetData={() => store.resetToSeedData()}
       />
 
@@ -69,6 +72,7 @@ export default function App() {
             event={state.event}
             onNavigateTab={setCurrentTab}
             onOpenRoleSwitcher={() => setIsRoleSwitcherOpen(true)}
+            onOpenVideoDemo={() => setIsVideoDemoOpen(true)}
           />
         )}
 
@@ -81,6 +85,7 @@ export default function App() {
                 teams={state.teams}
                 submissions={state.submissions}
                 onNavigateTab={setCurrentTab}
+                onOpenVideoDemo={() => setIsVideoDemoOpen(true)}
               />
             )}
 
@@ -256,6 +261,13 @@ export default function App() {
         onClose={() => setIsEmbedWidgetOpen(false)}
       />
 
+      <VideoWalkthroughModal
+        isOpen={isVideoDemoOpen}
+        onClose={() => setIsVideoDemoOpen(false)}
+        event={state.event}
+        currentUser={state.currentUser}
+      />
+
       {/* Footer (Clean, natural SaaS footer) */}
       <footer className="mt-auto border-t border-slate-200 bg-white py-6 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -268,6 +280,12 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-4 font-mono text-[11px]">
+            <button
+              onClick={() => setIsVideoDemoOpen(true)}
+              className="text-amber-700 hover:text-amber-800 font-bold cursor-pointer flex items-center gap-1"
+            >
+              <span>▶ 30s Demo Video</span>
+            </button>
             <button
               onClick={() => store.resetToSeedData()}
               className="text-slate-600 hover:text-slate-900 cursor-pointer"
